@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<canvas id="ctx" width="500" height="500" style="border:1px solid black"></canvas>
+		<script src = "https://cdn.socket.io/socket.io-1.4.5.js"></script>
+		<script>
+			var ctx = document.getElementById("ctx").getContext("2d");
+			ctx.font = '30px Arial';
+
+			var socket = io();
+
+			socket.on('newPositions', function(data) {
+				ctx.clearRect(0, 0, 500, 500); //clears the canvas
+				for(var i = 0; i < data.length; i++) //loops through each player
+					//every new connection will show up in the canvas
+					ctx.fillText(data[i].number,data[i].x,data[i].y); //number[i] represents the player by a  unique number
+			})
+
+			//event function that allows user interaction based on the keyPress
+			document.onKeydown = function(event) {
+				if(event.keyCode === 68) //ascii for d
+					socket.emit('keyPress',{inputId:'right',state:true});
+				if(event.keyCode === 83) //ascii for s
+					socket.emit('keyPress',{inputId:'down',state:true});
+				if(event.keyCode === 65) //ascii for a
+					socket.emit('keyPress',{inputId:'left',state:true});
+				if(event.keyCode === 87) //ascii for w
+					socket.emit('keyPress',{inputId:'up',state:true});
+			}
+			//if key is not being pressed down, set states to false
+			document.onKeyup = function(event) {
+				if(event.keyCode === 68) //ascii for d
+					socket.emit('keyPress',{inputId:'right',state:false});
+				if(event.keyCode === 83) //ascii for s
+					socket.emit('keyPress',{inputId:'down',state:false});
+				if(event.keyCode === 65) //ascii for a
+					socket.emit('keyPress',{inputId:'left',state:false});
+				if(event.keyCode === 87) //ascii for w
+					socket.emit('keyPress',{inputId:'up',state:false});
+			}
+		</script>
+	</head>
+	<body>
+
+	</body>
+</html>
