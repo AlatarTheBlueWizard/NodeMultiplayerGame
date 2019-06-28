@@ -1,0 +1,24 @@
+{
+  "name": "nodemultiplayergame",
+  "version": "1.0.0",
+  "description": "Multiplayer game project using node",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlatarTheBlueWizard/NodeMultiplayerGame.git"
+  },
+  "author": "Ryan Gale",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlatarTheBlueWizard/NodeMultiplayerGame/issues"
+  },
+  "homepage": "https://github.com/AlatarTheBlueWizard/NodeMultiplayerGame#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "http": "0.0.0",
+    "socket.io": "^2.2.0"
+  }
+}
