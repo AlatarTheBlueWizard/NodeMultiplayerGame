@@ -29,7 +29,7 @@
 		if(event.keyCode === 68) //keycode for d
 			socket.emit('keyPress',{inputId:'right',state:false});
 		if(event.keyCode === 83) //keycode for s
-			socket.emit('keyPress',{inputId:'down',state:true});
+			socket.emit('keyPress',{inputId:'down',state:false});
 		if(event.keyCode === 65) //keycode for a
 			socket.emit('keyPress',{inputId:'left',state:false});
 		if(event.keyCode === 87) //keycode for w
