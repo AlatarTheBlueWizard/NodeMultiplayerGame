@@ -1,14 +1,16 @@
 //File comm. code, requests files from server (images, etc.)
 var express = require('express');
 var app = express();
-var server = require('http').Server(app);
+//var server = require('http').Server(app);
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
 })
-app.use('/client', express.static(__dirname + '/client'));
-server.listen(2000); //listens on port 2000
-console.log('Server started');
+app.use(express.static(__dirname + '/client'));
+const port = process.env.PORT || 2000;
+app.listen(port, function() {
+	console.log('Server now running on port: ', port);
+});
 
 var SOCKET_LIST = {}; //list of sockets being read
 var PLAYER_LIST = {}; //list of players
