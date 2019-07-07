@@ -1,15 +1,14 @@
-var http = require('http');
 var express = require('express');
 var app = express();
-//var serv = require('http').Server(app);
-app.set('port', (process.env.PORT || 2000));
+var serv = require('http').Server(app);
+ 
 app.get('/',function(req, res) {
     res.sendFile(__dirname + '/client/index.html');
 });
-app.use(/*'/client',*/express.static(__dirname + '/client'));
-app.listen(app.get('port'), function() {
-	console.log('Listening on port ' , app.get('port'));
-});
+app.use('/client',express.static(__dirname + '/client'));
+ 
+serv.listen(process.env.PORT || 2000);
+console.log("Server listening on port 2000");
  
 var SOCKET_LIST = {};
  
@@ -113,7 +112,7 @@ Player.update = function(){
     }
     return pack;
 }
- 
+
 var Bullet = function(parent,angle){
     var self = Entity();
     self.id = Math.random();
@@ -183,7 +182,7 @@ var addUser = function(data,cb){
     },10);
 }
  
-var io = require('socket.io')/*(serv,{})*/;
+var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
     socket.id = Math.random();
     SOCKET_LIST[socket.id] = socket;
@@ -209,7 +208,6 @@ io.sockets.on('connection', function(socket){
             }
         });    
     });
-   
    
     socket.on('disconnect',function(){
         delete SOCKET_LIST[socket.id];
