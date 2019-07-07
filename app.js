@@ -7,9 +7,8 @@ app.get('/',function(req, res) {
 });
 app.use('/client',express.static(__dirname + '/client'));
  
-app.listen(process.env.PORT || 2000, function() {
-	console.log("Server listening on port %d", this.address().port, app.settings.env);
-});
+serv.listen(2000);
+console.log("Server listening on port 2000");
  
 var SOCKET_LIST = {};
  
@@ -60,7 +59,6 @@ var Player = function(id){
         b.x = self.x;
         b.y = self.y;
     }
-   
    
     self.updateSpd = function(){
         if(self.pressingRight)
@@ -114,7 +112,6 @@ Player.update = function(){
     }
     return pack;
 }
- 
  
 var Bullet = function(parent,angle){
     var self = Entity();
@@ -230,9 +227,6 @@ io.sockets.on('connection', function(socket){
         var res = eval(data);
         socket.emit('evalAnswer',res);     
     });
-   
-   
-   
 });
  
 setInterval(function(){
