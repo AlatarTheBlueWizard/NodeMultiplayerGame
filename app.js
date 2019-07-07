@@ -173,9 +173,7 @@ var DEBUG = true;
  
 var USERS = {
     //username:password
-    "bob":"asd",
-    "bob2":"bob",
-    "bob3":"ttt",  
+    "Admin":"123"  
 }
  
 //password validation
