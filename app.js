@@ -2,18 +2,22 @@ var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
 
+//set port to 2000
 app.set('port', (process.env.PORT || 2000));
 app.get('/',function(req, res) {
     res.sendFile(__dirname + '/client/index.html');
 });
 app.use('client', express.static(__dirname + '/client'));
- 
+
+//listen for port 2000
 serv.listen(app.get('port'), function(req, res){
     console.log('Game is running on port', app.get('port'));
 });
- 
+
+//list of sockets joined
 var SOCKET_LIST = {};
- 
+
+//location of player once joined
 var Entity = function(){
     var self = {
         x:250,
@@ -35,6 +39,7 @@ var Entity = function(){
     return self;
 }
  
+//uses entity for each player that joined to set location
 var Player = function(id){
     var self = Entity();
     self.id = id;
@@ -80,9 +85,11 @@ var Player = function(id){
     Player.list[id] = self;
     return self;
 }
+//list of players
 Player.list = {};
 Player.onConnect = function(socket){
     var player = Player(socket.id);
+    //movement functionality
     socket.on('keyPress',function(data){
         if(data.inputId === 'left')
             player.pressingLeft = data.state;
@@ -98,9 +105,11 @@ Player.onConnect = function(socket){
             player.mouseAngle = data.state;
     });
 }
+//deleted player id after disconnection
 Player.onDisconnect = function(socket){
     delete Player.list[socket.id];
 }
+//updates once player joins game
 Player.update = function(){
     var pack = [];
     for(var i in Player.list){
@@ -114,12 +123,12 @@ Player.update = function(){
     }
     return pack;
 }
-
+//bullet functionality
 var Bullet = function(parent,angle){
     var self = Entity();
     self.id = Math.random();
-    self.spdX = Math.cos(angle/180*Math.PI) * 10;
-    self.spdY = Math.sin(angle/180*Math.PI) * 10;
+    self.spdX = Math.cos(angle/180*Math.PI) * 10; //horiz spd
+    self.spdY = Math.sin(angle/180*Math.PI) * 10; //vert spd
     self.parent = parent;
     self.timer = 0;
     self.toRemove = false;
@@ -132,7 +141,7 @@ var Bullet = function(parent,angle){
         for(var i in Player.list){
             var p = Player.list[i];
             if(self.getDistance(p) < 32 && self.parent !== p.id){
-                //handle collision. ex: hp--;
+                //handle collision. 
                 self.toRemove = true;
             }
         }
@@ -140,8 +149,10 @@ var Bullet = function(parent,angle){
     Bullet.list[self.id] = self;
     return self;
 }
+//list of bullets
 Bullet.list = {};
  
+//remove or add bullets as mouse is clicked
 Bullet.update = function(){
     var pack = [];
     for(var i in Bullet.list){
@@ -167,16 +178,19 @@ var USERS = {
     "bob3":"ttt",  
 }
  
+//password validation
 var isValidPassword = function(data,cb){
     setTimeout(function(){
         cb(USERS[data.username] === data.password);
     },10);
 }
+//user validation
 var isUsernameTaken = function(data,cb){
     setTimeout(function(){
         cb(USERS[data.username]);
     },10);
 }
+//adds user
 var addUser = function(data,cb){
     setTimeout(function(){
         USERS[data.username] = data.password;
@@ -184,6 +198,7 @@ var addUser = function(data,cb){
     },10);
 }
  
+//multiplayer functionalty (sockets)
 var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
     socket.id = Math.random();
@@ -240,4 +255,4 @@ setInterval(function(){
         var socket = SOCKET_LIST[i];
         socket.emit('newPositions',pack);
     }
-},1000/25);
+},1000/25); //game runs at 25 framer per second
