@@ -71,6 +71,13 @@
     }
    
     //game
+    //container for img
+    var Img = {};
+    Img.player = new Image();
+    Img.player.src = '/client/img/player.png';
+    Img.map = new Image();
+    Img.map.src = '/client/img/map.png';
+
     var ctx = document.getElementById("ctx").getContext("2d");
     ctx.font = '30px Arial';
    
@@ -86,10 +93,16 @@
        
         self.draw = function(){
             var hpWidth = 30 * self.hp / self.hpMax;
+            ctx.fillStyle = 'red'; //color of hp bar
             ctx.fillRect(self.x - hpWidth/2,self.y - 40,hpWidth,4);
-            ctx.fillText(self.number,self.x,self.y);
+            
+            var width = Img.player.width*2;
+            var height = Img.player.width*2;
+
+            //draw the player image
+            ctx.drawImage(Img.player,0,0,Img.player.width,Img.player.height,self.x-width/2,self.y-height/2,width,height);
            
-            ctx.fillText(self.score,self.x,self.y-60);
+            //ctx.fillText(self.score,self.x,self.y-60);
         }
        
         Player.list[self.id] = self;
@@ -166,13 +179,18 @@
    
     setInterval(function(){
         ctx.clearRect(0,0,500,500);
+        drawMap();
         for(var i in Player.list)
             Player.list[i].draw();
         for(var i in Bullet.list)
             Bullet.list[i].draw();
     },40);
    
-   
+    //draw map
+    var drawMap = function() {
+        ctx.drawImage(Img.map,0,0);
+    }
+
     document.onkeydown = function(event){
         if(event.keyCode === 68)    //d
             socket.emit('keyPress',{inputId:'right',state:true});
