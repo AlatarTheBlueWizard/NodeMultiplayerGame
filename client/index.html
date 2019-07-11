@@ -76,6 +76,8 @@
     Img.player = new Image();
     //Img.player.src = '/client/img/player.png';
     Img.player.src = '/client/img/player.png';
+    Img.bullet = new Image();
+    Img.bullet.src = '/client/img/bullet.png';
     Img.map = new Image();
     //mg.map.src = '/client/img/map.png';
     Img.map.src = '/client/img/map.png';
@@ -122,7 +124,10 @@
         self.y = initPack.y;
        
         self.draw = function(){        
-            ctx.fillRect(self.x-5,self.y-5,10,10);
+            var width = Img.bullet.width/2;
+            var height = Img.bullet.width/2;
+
+            ctx.drawImage(Img.bullet,0,0,Img.bullet.width,Img.bullet.height,self.x-width/2,self.y-height/2,width,height);
         }
        
         Bullet.list[self.id] = self;       
