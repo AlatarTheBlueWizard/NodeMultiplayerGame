@@ -19,6 +19,8 @@
  
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script>
+    var WIDTH = 500;
+    var HEIGHT = 500;
     var socket = io();
    
     //sign
@@ -200,7 +202,9 @@
    
     //draw map
     var drawMap = function() {
-        ctx.drawImage(Img.map,-300,-450);
+        var x = WIDTH/2 - Player.list[selfId].x;
+        var y = HEIGHT/2 - Player.list[selfId].y;
+        ctx.drawImage(Img.map, x, y);
     }
 
     var drawScore = function() {
