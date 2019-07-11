@@ -325,7 +325,7 @@ setInterval(function(){
         var socket = SOCKET_LIST[i];
         socket.emit('init', initPack);
         socket.emit('update',pack);
-        socekt.emit('remove', removePack);
+        socket.emit('remove', removePack);
     }
     //set to empty every frame
     initPack.player = [];
