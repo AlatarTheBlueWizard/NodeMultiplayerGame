@@ -9,7 +9,7 @@
     <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
  
     <div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
-        <div>Chat Room</div>
+        <div>Hello!</div>
     </div>
  
     <form id="chat-form">
@@ -39,13 +39,13 @@
             signDiv.style.display = 'none';
             gameDiv.style.display = 'inline-block';
         } else
-            alert("Sign in unsuccessful.");
+            alert("Sign in unsuccessul.");
     });
     socket.on('signUpResponse',function(data){
         if(data.success){
-            alert("Sign up successful.");
+            alert("Sign up successul.");
         } else
-            alert("Sign up unsuccessful.");
+            alert("Sign up unsuccessul.");
     });
  
     //chat
@@ -69,13 +69,12 @@
             socket.emit('sendMsgToServer',chatInput.value);
         chatInput.value = '';      
     }
-
+   
     //game
     var ctx = document.getElementById("ctx").getContext("2d");
     ctx.font = '30px Arial';
    
-    //player object
-    var Player = function(initPack) {
+    var Player = function(initPack){
         var self = {};
         self.id = initPack.id;
         self.number = initPack.number;
@@ -84,48 +83,55 @@
         self.hp = initPack.hp;
         self.hpMax = initPack.hpMax;
         self.score = initPack.score;
-        self.draw = function() {
+       
+        self.draw = function(){
             var hpWidth = 30 * self.hp / self.hpMax;
             ctx.fillRect(self.x - hpWidth/2,self.y - 40,hpWidth,4);
             ctx.fillText(self.number,self.x,self.y);
+           
             ctx.fillText(self.score,self.x,self.y-60);
         }
+       
         Player.list[self.id] = self;
+       
+       
         return self;
     }
     Player.list = {};
-
-
-    //bullet object
-    var Bullet = function(initPack) {
+ 
+       
+    var Bullet = function(initPack){
         var self = {};
         self.id = initPack.id;
         self.x = initPack.x;
         self.y = initPack.y;
-        self.draw = function() {
+       
+        self.draw = function(){        
             ctx.fillRect(self.x-5,self.y-5,10,10);
         }
-        Bullet.list[self.id] = self;
+       
+        Bullet.list[self.id] = self;       
         return self;
     }
     Bullet.list = {};
-
-    //init logic
-    socket.on('init', function(data) {
-        for(var i = 0; i < data.player.length; i++) {
+   
+   
+    socket.on('init',function(data){   
+        //{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
+        for(var i = 0 ; i < data.player.length; i++){
             new Player(data.player[i]);
         }
-        for(var i = 0; i < data.bullet.length; i++) {
+        for(var i = 0 ; i < data.bullet.length; i++){
             new Bullet(data.bullet[i]);
         }
     });
-
-    //update logic
-    socket.on('update', function(data) {
-        for(var  i = 0; i < data.player.length; i++) {
+   
+    socket.on('update',function(data){
+        //{ player : [{id:123,x:0,y:0},{id:1,x:0,y:0}], bullet: []}
+        for(var i = 0 ; i < data.player.length; i++){
             var pack = data.player[i];
             var p = Player.list[pack.id];
-            if(p) {
+            if(p){
                 if(pack.x !== undefined)
                     p.x = pack.x;
                 if(pack.y !== undefined)
@@ -136,10 +142,10 @@
                     p.score = pack.score;
             }
         }
-        for(var i = 0; i < data.bullet.length; i++) {
+        for(var i = 0 ; i < data.bullet.length; i++){
             var pack = data.bullet[i];
             var b = Bullet.list[data.bullet[i].id];
-            if(b) {
+            if(b){
                 if(pack.x !== undefined)
                     b.x = pack.x;
                 if(pack.y !== undefined)
@@ -147,24 +153,25 @@
             }
         }
     });
-
-    //remove logic
-    socket.on('remove', function(data) {
-        for(var i = 0; i < data.player.length; i++) {
+   
+    socket.on('remove',function(data){
+        //{player:[12323],bullet:[12323,123123]}
+        for(var i = 0 ; i < data.player.length; i++){
             delete Player.list[data.player[i]];
         }
-        for(var i = 0; i < data.bullet.length; i++) {
+        for(var i = 0 ; i < data.bullet.length; i++){
             delete Bullet.list[data.bullet[i]];
         }
     });
-
-    setInterval(function() { //refresh from client rather than server
+   
+    setInterval(function(){
         ctx.clearRect(0,0,500,500);
         for(var i in Player.list)
             Player.list[i].draw();
         for(var i in Bullet.list)
             Bullet.list[i].draw();
-    },40); //every 40 ms, this function is called 
+    },40);
+   
    
     document.onkeydown = function(event){
         if(event.keyCode === 68)    //d
@@ -188,15 +195,12 @@
             socket.emit('keyPress',{inputId:'up',state:false});
     }
    
-    // fires bullets
     document.onmousedown = function(event){
         socket.emit('keyPress',{inputId:'attack',state:true});
     }
-    //halts bullets
     document.onmouseup = function(event){
         socket.emit('keyPress',{inputId:'attack',state:false});
     }
-    //rotates bullet movement (circular motion)
     document.onmousemove = function(event){
         var x = -250 + event.clientX - 8;
         var y = -250 + event.clientY - 8;
