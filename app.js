@@ -2,14 +2,16 @@ var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
  
+app.set('port', (process.env.PORT || 2000));
 app.get('/',function(req, res) {
     res.sendFile(__dirname + '/client/index.html');
 });
-app.use('/client',express.static(__dirname + '/client'));
+app.use('client',express.static(__dirname + '/client'));
  
-serv.listen(2000);
-console.log("Server started.");
- 
+serv.listen(app.get('port'), function(req, res) {
+	console.log('Game is running on port', app.get('port'));
+});
+
 var SOCKET_LIST = {};
  
 var Entity = function(){
