@@ -51,6 +51,9 @@ var Player = function(id){
     self.pressingAttack = false;
     self.mouseAngle = 0;
     self.maxSpd = 10;
+    self.hp = 10;
+    self.hpMax = 10;
+    self.score = 0;
    
     var super_update = self.update;
     self.update = function(){
@@ -82,13 +85,31 @@ var Player = function(id){
         else
             self.spdY = 0;     
     }
+    
+    self.getInitPack = function() {
+    	return {
+    		id:self.id,
+    		x:self.x,
+    		y:self.y,
+    		number:self.number,
+    		hp:self.hp,
+    		hpMax:self.hpMax,
+    		score:self.score,
+    	};
+    }
+
+    self.getUpdatePack = function() {
+    	return {
+    		id:self.id,
+    		x:self.x,
+    		y:self.y,
+    		hp:self.hp,
+    		score:self.score,
+    	};
+    }
+
     Player.list[id] = self;
-    initPack.player.push({
-    	id:self.id,
-    	x:self.x,
-    	y:self.y,
-    	number:self.number,
-    });
+    initPack.player.push(self.getInitPack());
     return self;
 }
 //list of players
@@ -110,7 +131,20 @@ Player.onConnect = function(socket){
         else if(data.inputId === 'mouseAngle')
             player.mouseAngle = data.state;
     });
+
+    socket.emit('init',{
+    	player:Player.getAllInitPack(),
+    	bullet:Bullet.getAllInitPack(),
+    });
 }
+
+Player.getAllInitPack = function() {
+	var players = [];
+	for(var i in Player.list)
+		players.push(Player.list[i].getInitPack());
+	return players;
+}
+
 //deleted player id after disconnection
 Player.onDisconnect = function(socket){
     delete Player.list[socket.id];
@@ -122,11 +156,7 @@ Player.update = function(){
     for(var i in Player.list){
         var player = Player.list[i];
         player.update();
-        pack.push({
-        	id:player.id,
-            x:player.x,
-            y:player.y,
-        });    
+        pack.push(player.getUpdatePack());
     }
     return pack;
 }
@@ -147,18 +177,38 @@ var Bullet = function(parent,angle){
        
         for(var i in Player.list){
             var p = Player.list[i];
-            if(self.getDistance(p) < 32 && self.parent !== p.id){
-                //handle collision. 
-                self.toRemove = true;
+            if(self.getDistance(p) < 32 && self.parent !== p.id)
+            	p.hp -= 1;
+            if(p.hp <= 0){
+            	var shooter = Player.list[self.parent];
+            	if(shooter)
+            		shooter.score += 1;
+            	p.hp = p.hpMax;
+            	p.x = Math.random() * 500;
+            	p.y = Math.random() * 500;
             }
+            self.toRemove = true;
         }
     }
+
+    self.getInitPack = function() {
+    	return {
+    		id:self.id,
+    		x:self.x,
+    		y:self.y,
+    	};
+    }
+
+    self.getUpdatePack = function() {
+    	return {
+    		id:self.id,
+    		x:self.x,
+    		y:self.y,
+    	};
+    }
+
     Bullet.list[self.id] = self;
-    initPack.bullet.push({
-    	id:self.id,
-    	x:self.x,
-    	y:self.y,
-    });
+    initPack.bullet.push(self.getInitPack());
     return self;
 }
 //list of bullets
@@ -175,20 +225,24 @@ Bullet.update = function(){
             removePack.bullet.push(bullet.id);
         }
         else
-            pack.push({
-            	id:bullet.id,
-                x:bullet.x,
-                y:bullet.y,
-            });    
+           pack.push(bullet.getUpdatePack());   
     }
     return pack;
+}
+
+Bullet.getAllInitPack = function() {
+	var bullets = [];
+	for(var i in Bullet.list)
+		bullets.push(Bullet.list[i].getInitPack());
+	return bullets;
 }
  
 var DEBUG = true;
  
 var USERS = {
     //username:password
-    "Admin":"123"  
+    "Admin":"123",
+    "Admin2": "456"  
 }
  
 //password validation
