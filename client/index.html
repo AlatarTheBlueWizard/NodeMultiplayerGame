@@ -48,23 +48,10 @@
             alert("Sign up unsuccessful.");
     });
  
-    //game
+    //chat
     var chatText = document.getElementById('chat-text');
     var chatInput = document.getElementById('chat-input');
     var chatForm = document.getElementById('chat-form');
-    var ctx = document.getElementById("ctx").getContext("2d");
-    ctx.font = '30px Arial';
-   
-       
-    socket.on('newPositions',function(data){
-        ctx.clearRect(0,0,500,500);
-        //player represented as number
-        for(var i = 0 ; i < data.player.length; i++)
-            ctx.fillText(data.player[i].number,data.player[i].x,data.player[i].y);     
-           
-        for(var i = 0 ; i < data.bullet.length; i++)
-            ctx.fillRect(data.bullet[i].x-5,data.bullet[i].y-5,10,10);     
-    });
    
     socket.on('addToChat',function(data){
         chatText.innerHTML += '<div>' + data + '</div>';
@@ -82,6 +69,83 @@
             socket.emit('sendMsgToServer',chatInput.value);
         chatInput.value = '';      
     }
+
+    //game
+    var ctx = document.getElementById("ctx").getContext("2d");
+    ctx.font = '30px Arial';
+   
+    //player object
+    var Player = function(initPack) {
+        var self = {};
+        self.id = initPack.id;
+        self.number = initPack.number;
+        self.x = initPack.x;
+        self.y = initPack.y;
+        Player.list[self.id] = self;
+        return self;
+    }
+    Player.list = {};
+
+
+    //bullet object
+    var Bullet = function(initPack) {
+        var self = {};
+        self.id = initPack.id;
+        self.x = initPack.x;
+        self.y = initPack.y;
+        Bullet.list[self.id] = self;
+        return self;
+    }
+    Bullet.list = {};
+
+    //init logic
+    socket.on('init', function(data) {
+        for(var i = 0; i < data.player.length; i++) {
+            new Player(data.player[i]);
+        }
+        for(var i = 0; i < data.bullet.length; i++) {
+            new Bullet(data.bullet[i]);
+        }
+    });
+
+    //update logic
+    socket.on('update', function(data) {
+        for(var  i = 0; i < data.player.length; i++) {
+            var pack = data.player[i];
+            var p = Player.list[pack.id];
+            if(p) {
+                if(p.x !== undefined)
+                    p.x = pack.x;
+                if(p.y !== undefined)
+                    p.y = pack.y;
+            }
+        }
+        for(var i = 0; i < data.bullet.length; i++) {
+            var pack = data.bullet[i];
+            var b = Bullet.list[data.bullet[i].id];
+            if(b) {
+                if(b.x !== undefined)
+                    b.x = pack.x;
+                if(b.y !== undefined)
+                    b.y = pack.y;
+            }
+        }
+    });
+
+
+    //remove
+        //id
+
+
+    socket.on('newPositions',function(data){
+        ctx.clearRect(0,0,500,500);
+        //player represented as number
+        for(var i = 0 ; i < data.player.length; i++)
+            ctx.fillText(data.player[i].number,data.player[i].x,data.player[i].y);     
+           
+        for(var i = 0 ; i < data.bullet.length; i++)
+            ctx.fillRect(data.bullet[i].x-5,data.bullet[i].y-5,10,10);     
+    });
    
     document.onkeydown = function(event){
         if(event.keyCode === 68)    //d
