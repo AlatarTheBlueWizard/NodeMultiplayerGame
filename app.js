@@ -1,7 +1,9 @@
+// modules needed for express and http
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
  
+// app listening on port 2000
 app.set('port', (process.env.PORT || 2000));
 app.get('/',function(req, res) {
     res.sendFile(__dirname + '/client/index.html');
@@ -12,8 +14,10 @@ serv.listen(app.get('port'), function(req, res) {
 	console.log('Game is running on port', app.get('port'));
 });
 
+// list of socket connections
 var SOCKET_LIST = {};
  
+// entity object for each player that joins
 var Entity = function(){
     var self = {
         x:250,
@@ -35,6 +39,7 @@ var Entity = function(){
     return self;
 }
  
+// Player object set with spd, hp, etc.
 var Player = function(id){
     var self = Entity();
     self.id = id;
@@ -54,17 +59,20 @@ var Player = function(id){
     self.update = function(){
         self.updateSpd();
         super_update();
-       
+       	
+       	// bullet config
         if(self.pressingAttack){
             self.shootBullet(self.mouseAngle);
         }
     }
+    // player attack
     self.shootBullet = function(angle){
         var b = Bullet(self.id,angle);
         b.x = self.x;
         b.y = self.y;
     }
    
+   	//spd management 
     self.updateSpd = function(){
         if(self.pressingRight)
             self.spdX = self.maxSpd;
@@ -80,7 +88,7 @@ var Player = function(id){
         else
             self.spdY = 0;     
     }
-   
+   	
     self.getInitPack = function(){
         return {
             id:self.id,
@@ -107,9 +115,11 @@ var Player = function(id){
     initPack.player.push(self.getInitPack());
     return self;
 }
+// list of players
 Player.list = {};
 Player.onConnect = function(socket){
     var player = Player(socket.id);
+    // config for movement 
     socket.on('keyPress',function(data){
         if(data.inputId === 'left')
             player.pressingLeft = data.state;
@@ -138,10 +148,13 @@ Player.getAllInitPack = function(){
     return players;
 }
  
+// disconnect config
 Player.onDisconnect = function(socket){
     delete Player.list[socket.id];
     removePack.player.push(socket.id);
 }
+
+// update config
 Player.update = function(){
     var pack = [];
     for(var i in Player.list){
@@ -152,7 +165,7 @@ Player.update = function(){
     return pack;
 }
  
- 
+// bullet configuration
 var Bullet = function(parent,angle){
     var self = Entity();
     self.id = Math.random();
@@ -171,7 +184,8 @@ var Bullet = function(parent,angle){
             var p = Player.list[i];
             if(self.getDistance(p) < 32 && self.parent !== p.id){
                 p.hp -= 1;
-                               
+                
+                // adds score if player is defeated       
                 if(p.hp <= 0){
                     var shooter = Player.list[self.parent];
                     if(shooter)
@@ -228,6 +242,7 @@ Bullet.getAllInitPack = function(){
  
 var DEBUG = true;
  
+// users hardcoded for login
 var USERS = {
     //username:password
     "Admin":"123",
@@ -326,4 +341,4 @@ setInterval(function(){
     removePack.player = [];
     removePack.bullet = [];
    
-},1000/25);
+},1000/25); //game runs at 25 frames per second
