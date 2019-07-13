@@ -1,7 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dungeon Blaster</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h1>Welcome to Dungeon Blaster!</h1>
 <div id="signDiv">
     Username: <input id="signDiv-username" type="text"></input>
     <br/><br/>
-    Password:  <input id="signDiv-password" type="password"></input>
+    Password: <input id="signDiv-password" type="password"></input>
     <button id="signDiv-signIn">Sign In</button>
     <button id="signDiv-signUp">Sign Up</button>
 </div>
@@ -249,3 +261,5 @@
         socket.emit('keyPress',{inputId:'mouseAngle',state:angle});
     }
 </script>
+</body>
+</html>
