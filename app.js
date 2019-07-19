@@ -1,7 +1,7 @@
 //require databse, entity, and inventory files
-require('./Database');
-require('./Entity');
-require('./client/Inventory');
+require('./Database.js');
+require('./Entity.js');
+require('./client/Inventory.js');
 
 // modules needed for express and http
 var express = require('express');
