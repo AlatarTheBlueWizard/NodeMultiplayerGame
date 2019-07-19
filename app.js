@@ -26,11 +26,42 @@ var DEBUG = true;
 //multiplayer functionalty (sockets)
 var io = require('socket.io')(serv,{});
 io.sockets.on('connection',function(socket){
-	socket.id = Math.random();
-	SOCKET_LIST[socket.id] = socket;
-
-	socket.on('signIn',function(data){
-
+socket.on('signIn',function(data){ //{username,password}
+		Database.isValidPassword(data,function(res){
+			if(!res)
+				return socket.emit('signInResponse',{success:false});
+			Database.getPlayerProgress(data.username,function(progress){
+				Player.onConnect(socket,data.username,progress);
+				socket.emit('signInResponse',{success:true});
+			})
+		});
+	});
+	
+	//sign up config
+	socket.on('signUp',function(data){
+		Database.isUsernameTaken(data,function(res){
+			if(res){
+				socket.emit('signUpResponse',{success:false});		
+			} else {
+				Database.addUser(data,function(){
+					socket.emit('signUpResponse',{success:true});					
+				});
+			}
+		});		
+	});
+	
+	//disconnect config
+	socket.on('disconnect',function(){
+		delete SOCKET_LIST[socket.id];
+		Player.onDisconnect(socket);
+	});
+	
+	//config for messaging
+	socket.on('evalServer',function(data){
+		if(!DEBUG)
+			return;
+		var res = eval(data);
+		socket.emit('evalAnswer',res);		
 	});
 });
  
