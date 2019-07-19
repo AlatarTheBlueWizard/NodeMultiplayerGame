@@ -143,3 +143,103 @@ Player = function(param){
 	return self;
 }
 
+//list of players in game
+Player.list = {};
+Player.onConnect = function(socket,username,progress){
+	var map = 'forest';
+	if(Math.random() < 0.5)
+		map = 'field';
+	var player = Player({
+		username:username,
+		id:socket.id,
+		map:map,
+		socket:socket,
+		progress:progress,
+	});
+	//refresh inventory on player connect
+	player.inventory.refreshRender();
+
+	//key press config
+	socket.on('keyPress',function(data){
+		if(data.inputId === 'left')
+			player.pressingLeft = data.state;
+		else if(data.inputId === 'right')
+			player.pressingRight = data.state;
+		else if(data.inputId === 'up')
+			player.pressingUp = data.state;
+		else if(data.inputId === 'down')
+			player.pressingDown = data.state;
+		else if(data.inputId === 'attack')
+			player.pressingAttack = data.state;
+		else if(data.inputId === 'mouseAngle')
+			player.mouseAngle = data.state;
+	});
+
+	//map change config
+	socket.on('changeMap',function(data){
+		if(player.map === 'field')
+			player.map = 'forest';
+		else
+			player.map = 'field';
+	});
+
+	//chat message config
+	socket.on('sendMsgToServer',function(data){
+		for(var i in SOCKET_LIST){
+			SOCKET_LIST[i].emit('addToChat',player.username + ': ' + data);
+		}
+	});
+
+	//personal chat message config
+	socket.on('sendPmToServer',function(data){
+		var recipientSocket = null;
+		for(var i in Player.list)
+			if(Player.list[i].username === data.username)
+				recipientSocket = SOCKET_LIST[i];
+		if(recipientSocket === null)
+			socket.emit('addToChat','The player ' + data.username + ' is not online.');
+		else {
+			recipientSocket.emit('addToChat','From ' + player.username + ':' + data.message);
+			socket.emit('addToChat','To ' + data.username + ':' + data.message);
+		}
+	});
+
+	//emit message config
+	socket.emit('init',{
+		selfId:socket.id,
+		player:Player.getAllInitPack(),
+		bullet:Bullet.getAllInitPack(),
+	})
+}
+
+//all data config for players
+Player.getAllInitPack = function(){
+	var players = [];
+	for(var i in Player.list)
+		players.push(Player.list[i].getInitPack());
+	return players;
+}
+
+//player disconnect config
+Player.onDisconnect = function(socket){
+	let player = Player.list[socket.id];
+	if(!player)
+		return;
+	Database.savePlayerProgress({
+		username:player.username,
+		items:player.inventory.items,
+	});
+	delete Player.list[socket.id];
+	removePack.player.push(socket.id);
+}
+
+//player update config
+Player.update = function(){
+	var pack = [];
+	for(var i in Player.list){
+		var player = Player.list[i];
+		player.update();
+		pack.push(player.getUpdatePack());
+	}
+	return pack;
+}
