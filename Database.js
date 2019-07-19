@@ -4,9 +4,11 @@ var db = USE_DB ? mongojs('mongodb+srv://user:pass@mygame-4y1xa.mongodb.net/test
 */
 //account collection: {username:string, password:string}
 //progress collection: {username:string, items:[{id:string,amount:number}]}
-var mongodb = require('mongodb');
+var USE_DB = true;
+var mongodb = USE_DB ? require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var url = 'mongodb+srv://user:pass@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';
+var db = USE_DB ? url;
 
 MongoClient.connect(url,function(err,db){
 	if(err)
