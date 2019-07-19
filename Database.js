@@ -1,9 +1,9 @@
 var USE_DB = true;
 var mongojs = USE_DB ? require("mongojs") : null;
-var db = USE_DB ? mongojs('mongodb+srv://admin:Game01@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority', ['account','progress']) : null;
+var db = USE_DB ? mongojs('mongodb+srv://user:pass@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority', ['account','progress']) : null;
 
-//account table: {username:string, password:string}
-//progress table: {username:string, items:[{id:string,amount:number}]}
+//account collection: {username:string, password:string}
+//progress collection: {username:string, items:[{id:string,amount:number}]}
 
 Database = {};
 Database.isValidPassword = function(data,cb){
