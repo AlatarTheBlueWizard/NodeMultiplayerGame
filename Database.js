@@ -14,7 +14,7 @@ MongoClient.connect(url,function(err,db){
 	if(err)
 		console.log('Unable to connect to the mongoDB server. Error:', err);
 	else {
-		Database = {};
+		var Database = {};
 		Database.isValidPassword = function(data,cb){
 			if(!USE_DB)
 				return cb(true);
