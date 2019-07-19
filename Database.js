@@ -10,11 +10,12 @@ var MongoClient = mongodb.MongoClient;
 var url = 'mongodb+srv://user:pass@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';
 var db = USE_DB ? url : null;
 
+Database = {};
 MongoClient.connect(url,function(err,db){
 	if(err)
 		console.log('Unable to connect to the mongoDB server. Error:', err);
 	else {
-		Database = {};
+		//Database = {};
 		Database.isValidPassword = function(data,cb){
 			if(!USE_DB)
 				return cb(true);
