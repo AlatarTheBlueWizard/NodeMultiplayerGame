@@ -1,7 +1,7 @@
 var USE_DB = true;
 var mongojs = USE_DB ? require("mongojs") : null;
 //var db = USE_DB ? mongojs('localhost:27017/myGame', ['account','progress']) : null;
-var db = USE_DB ? mongojs('mongodb+srv://admin:ad@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority', ['account','progress']) : null;
+var db = USE_DB ? 'mongodb+srv://admin:ad@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';//, ['account','progress'] : null;
 
 //account:  {username:string, password:string}
 //progress:  {username:string, items:[{id:string,amount:number}]}
