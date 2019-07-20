@@ -1,12 +1,7 @@
 var USE_DB = true;
 var mongojs = USE_DB ? require("mongojs") : null;
-var mongoose = USE_DB ? require("mongoose") : null;
-//var db = USE_DB ? mongojs('localhost:27017/myGame', ['account','progress']) : null;
-//var db = USE_DB ? 'mongodb+srv://admin:ad@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';//, ['account','progress'] : null;
-var uri = "mongodb+srv://admin:ad@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority";
-retryWrites = true;
-mongoose.connect(uri, {useNewUrlParser: true});
-var db = mongoose.connection;
+var url = process.env.MONGOLAB_URI;
+var db = USE_DB ? mongojs(url, ['account','progress']) : null;
 //account:  {username:string, password:string}
 //progress:  {username:string, items:[{id:string,amount:number}]}
 
