@@ -9,7 +9,7 @@ var mongodb = USE_DB ? require('mongodb') : null;
 var mongojs = USE_DB ? require("mongojs") : null;
 var MongoClient = mongodb.MongoClient;
 var url = 'mongodb+srv://user:pass@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';
-var db = USE_DB ? url : null;
+var db = USE_DB ? mongodb(url, ['account','progress']) : null;
 
 Database = {};
 Database.isValidPassword = function(data,cb){
