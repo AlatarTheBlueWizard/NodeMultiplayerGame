@@ -1,7 +1,5 @@
-var initPack = {player:[],bullet:[]};
+/*var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
-
-
 
 Entity = function(param){
 	var self = {
@@ -303,4 +301,4 @@ Bullet.getAllInitPack = function(){
 	for(var i in Bullet.list)
 		bullets.push(Bullet.list[i].getInitPack());
 	return bullets;
-}
+}*/
