@@ -1,6 +1,6 @@
 var USE_DB = true;
 var mongojs = USE_DB ? require("mongojs") : null;
-var uri = require('./config/keys').MONGO_URI;
+var uri = process.env.MONGO_URI;
 var db = USE_DB ? mongojs(uri, ['account','progress']) : null;
 //account:  {username:string, password:string}
 //progress:  {username:string, items:[{id:string,amount:number}]}
