@@ -250,8 +250,8 @@
     
     var drawMap = function(){
         var player = Player.list[selfId];
-        var x = WIDTH - player.x;
-        var y = HEIGHT - player.y;
+        var x = WIDTH*2 - player.x;
+        var y = HEIGHT*2 - player.y;
         ctx.drawImage(Img.map[player.map],x,y);
     }
     
