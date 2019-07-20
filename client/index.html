@@ -22,29 +22,29 @@
 <body>
 <h1>Welcome to Dungeon Blaster!</h1>
 <div id="signDiv">
-    Username: <input id="signDiv-username" type="text"></input>
-    <br/><br/>
+    Username: <input id="signDiv-username" type="text"></input><br>
     Password: <input id="signDiv-password" type="password"></input>
     <button id="signDiv-signIn">Sign In</button>
     <button id="signDiv-signUp">Sign Up</button>
 </div>
- 
+
 <div id="gameDiv" style="display:none;">
     <div id="game" style="position:absolute;width:500px;height:500px">
         <canvas id="ctx" width="500" height="500" style="position:absolute;border:1px solid #000000;"></canvas>
         <canvas id="ctx-ui" width="500" height="500" style="position:absolute;border:1px solid #000000;"></canvas>
-
+        
         <div id="ui" style="position:absolute;width:500px;height:500px;">
             <button onclick="changeMap()" style="position:absolute;bottom:0px;left:0px">
                 Change Map
             </button>
+        
         </div>
-
+        
     </div>
- 
+    
     <div id="belowGame" style="margin-top:520px">   
         <div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
-            <div>Chat Room</div>
+            <div>Hello!</div>
         </div>
         <div id="inventory"></div>
         <form id="chat-form">
@@ -52,11 +52,12 @@
         </form>
     </div>
 </div>
- 
-<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+<!--<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>-->
 <script src="/client/socket.js"></script>
 <script src="/client/Inventory.js"></script>
 <script>
+    // 
     var WIDTH = 500;
     var HEIGHT = 500;
     var socket = io();
@@ -130,15 +131,15 @@
     //game
     var Img = {};
     Img.player = new Image();
-    Img.player.src = '/client/player02.png';
+    Img.player.src = '/client/img/player.png';
     Img.bullet = new Image();
-    Img.bullet.src = '/client/img/bullet02.png';
+    Img.bullet.src = '/client/img/bullet.png';
     
     Img.map = {};
     Img.map['field'] = new Image();
-    Img.map['field'].src = '/client/img/map02.png';
+    Img.map['field'].src = '/client/img/map.png';
     Img.map['forest'] = new Image();
-    Img.map['forest'].src = '/client/img/map03.png';
+    Img.map['forest'].src = '/client/img/map2.png';
     
     var ctx = document.getElementById("ctx").getContext("2d");
     var ctxUi = document.getElementById("ctx-ui").getContext("2d");
