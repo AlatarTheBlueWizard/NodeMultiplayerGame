@@ -7,7 +7,9 @@ var db = USE_DB ? mongodb(uri, ['account','progress']) : null;*/
 var USE_DB = true;
 var databaseUrl = 'mongodb+srv://admin:ad@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';
 var collections = ["account","progress"];
-var db = USE_DB ? require("mongojs").connect(databaseUrl, collections) : null;
+var mongojs = require('mongojs');
+var db = USE_DB ? mongojs(databaseUrl, collections) : null;
+
 Database = {};
 Database.isValidPassword = function(data,cb){
     if(!USE_DB)
