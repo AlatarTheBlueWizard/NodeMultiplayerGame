@@ -1,6 +1,6 @@
-require('./Database');
-require('./Entity');
-require('./client/Inventory');
+require('./Database.js');
+require('./Entity.js');
+require('./client/Inventory.js');
 
 var express = require('express');
 var app = express();
@@ -15,8 +15,6 @@ serv.listen(process.env.PORT || 2000);
 console.log("Server started.");
 
 var SOCKET_LIST = {};
-
-
 var DEBUG = true;
 
 
