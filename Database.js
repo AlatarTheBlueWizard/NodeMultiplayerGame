@@ -5,7 +5,7 @@ var db = USE_DB ? mongodb(uri, ['account','progress']) : null;*/
 //account:  {username:string, password:string}
 //progress:  {username:string, items:[{id:string,amount:number}]}
 var USE_DB = true;
-var databaseUrl = 'mongodb+srv://admin:ad@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';
+var databaseUrl = '"127.0.0.1:27017/"+myGame';
 var collections = ["account","progress"];
 var mongojs = require('mongojs');
 var db = USE_DB ? mongojs(databaseUrl, collections) : null;
