@@ -35,8 +35,8 @@
 <script src="/client/socket.js"></script>
 <script>
     // 
-    var WIDTH = 500; //width of drawn map
-    var HEIGHT = 500; //height of drawn map
+    var WIDTH = 250; //width of drawn map
+    var HEIGHT = 250; //height of drawn map
     var socket = io();
     
     //sign
@@ -112,8 +112,6 @@
     Img.map = {};
     Img.map['field'] = new Image();
     Img.map['field'].src = '/client/img/map02.png';
-    Img.map['field'].height = '800px';
-    Img.map['field'].width = '800px';
     Img.map['forest'] = new Image();
     Img.map['forest'].src = '/client/img/map03.png';
     Img.map['dungeon'] = new Image();
