@@ -114,6 +114,8 @@
     Img.map['field'].src = '/client/img/map02.png';
     Img.map['forest'] = new Image();
     Img.map['forest'].src = '/client/img/map03.png';
+    Img.map['dungeon'] = new Image();
+    Img.map['dungeon'].src = '/client/img/map.png';
     
     var ctx = document.getElementById("ctx").getContext("2d");
     var ctxUi = document.getElementById("ctx-ui").getContext("2d");
@@ -138,6 +140,7 @@
             var x = self.x - Player.list[selfId].x + WIDTH/2;
             var y = self.y - Player.list[selfId].y + HEIGHT/2;
             
+            //hp bar
             var hpWidth = 30 * self.hp / self.hpMax;
             ctx.fillStyle = 'red';
             ctx.fillRect(x - hpWidth/2,y - 40,hpWidth,4);

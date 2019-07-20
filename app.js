@@ -143,6 +143,8 @@ Player.onConnect = function(socket,username){
 	var map = 'forest';
 	if(Math.random() < 0.5)
 		map = 'field';
+	else if(Math.random() < 0.5)
+		map = 'dungeon';
 	var player = Player({
 		username:username,
 		id:socket.id,
@@ -168,6 +170,8 @@ Player.onConnect = function(socket,username){
 	socket.on('changeMap',function(data){
 		if(player.map === 'field')
 			player.map = 'forest';
+		else if(player.map === 'forest')
+			player.map = 'dungeon';
 		else
 			player.map = 'field';
 	});
