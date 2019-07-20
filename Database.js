@@ -7,7 +7,7 @@ var db = USE_DB ? mongodb(uri, ['account','progress']) : null;*/
 var USE_DB = true;
 var collections = ["account","progress"];
 var mongojs = require('mongojs');
-var db = USE_DB ? mongojs("127.0.0.1:27017/"+myGame, collections) : null;
+var db = USE_DB ? mongojs('localhost:27017/myGame', collections) : null;
 
 Database = {};
 Database.isValidPassword = function(data,cb){
