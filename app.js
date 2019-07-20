@@ -348,14 +348,21 @@ io.sockets.on('connection', function(socket){
 	
 });
 
-
 setInterval(function(){
-	var packs = Entity.getFrameUpdateData();
+	var pack = {
+		player:Player.update(),
+		bullet:Bullet.update(),
+	}
+	
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
-		socket.emit('init',packs.initPack);
-		socket.emit('update',packs.updatePack);
-		socket.emit('remove',packs.removePack);
+		socket.emit('init',initPack);
+		socket.emit('update',pack);
+		socket.emit('remove',removePack);
 	}
+	initPack.player = [];
+	initPack.bullet = [];
+	removePack.player = [];
+	removePack.bullet = [];
 	
 },1000/25);
