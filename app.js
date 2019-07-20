@@ -1,3 +1,4 @@
+//need express, and http
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
@@ -7,9 +8,11 @@ app.get('/',function(req, res) {
 });
 app.use('/client',express.static(__dirname + '/client'));
 
+//listening on current heroku port or 2000
 serv.listen(process.env.PORT || 2000);
 console.log("Server started.");
 
+//socket list for each player connection
 var SOCKET_LIST = {};
 var Entity = function(param){
 	var self = {
@@ -31,19 +34,23 @@ var Entity = function(param){
 			self.id = param.id;		
 	}
 	
+	//updates self position
 	self.update = function(){
 		self.updatePosition();
 	}
+	//location of current player
 	self.updatePosition = function(){
 		self.x += self.spdX;
 		self.y += self.spdY;
 	}
+	//distance between each player
 	self.getDistance = function(pt){
 		return Math.sqrt(Math.pow(self.x-pt.x,2) + Math.pow(self.y-pt.y,2));
 	}
 	return self;
 }
 
+//player object, includes spd, hp, and score also key location
 var Player = function(param){
 	var self = Entity(param);
 	self.number = "" + Math.floor(10 * Math.random());
@@ -65,10 +72,12 @@ var Player = function(param){
 		
 		super_update();
 		
+		//shoots if holding mouse click
 		if(self.pressingAttack){
 			self.shootBullet(self.mouseAngle);
 		}
 	}
+	//location of bullets
 	self.shootBullet = function(angle){
 		Bullet({
 			parent:self.id,
@@ -79,6 +88,7 @@ var Player = function(param){
 		});
 	}
 	
+	//updates speed of player
 	self.updateSpd = function(){
 		if(self.pressingRight)
 			self.spdX = self.maxSpd;
@@ -95,6 +105,7 @@ var Player = function(param){
 			self.spdY = 0;		
 	}
 	
+	//gets data of current player
 	self.getInitPack = function(){
 		return {
 			id:self.id,
@@ -107,6 +118,7 @@ var Player = function(param){
 			map:self.map,
 		};		
 	}
+	//gets updated data of player
 	self.getUpdatePack = function(){
 		return {
 			id:self.id,
@@ -118,12 +130,15 @@ var Player = function(param){
 		}	
 	}
 	
+	//sets each player to a specific id
 	Player.list[self.id] = self;
 	
 	initPack.player.push(self.getInitPack());
 	return self;
 }
+//list of players connected
 Player.list = {};
+//handles location once connected
 Player.onConnect = function(socket,username){
 	var map = 'forest';
 	if(Math.random() < 0.5)
@@ -133,6 +148,7 @@ Player.onConnect = function(socket,username){
 		id:socket.id,
 		map:map,
 	});
+	//key press functionality
 	socket.on('keyPress',function(data){
 		if(data.inputId === 'left')
 			player.pressingLeft = data.state;
@@ -148,6 +164,7 @@ Player.onConnect = function(socket,username){
 			player.mouseAngle = data.state;
 	});
 	
+	//change map functionality
 	socket.on('changeMap',function(data){
 		if(player.map === 'field')
 			player.map = 'forest';
@@ -155,16 +172,19 @@ Player.onConnect = function(socket,username){
 			player.map = 'field';
 	});
 	
+	//message sending functionality
 	socket.on('sendMsgToServer',function(data){
 		for(var i in SOCKET_LIST){
 			SOCKET_LIST[i].emit('addToChat',player.username + ': ' + data);
 		}
 	});
-	socket.on('sendPmToServer',function(data){ //data:{username,message}
+	//personal message functionality
+	socket.on('sendPmToServer',function(data){ 
 		var recipientSocket = null;
 		for(var i in Player.list)
 			if(Player.list[i].username === data.username)
 				recipientSocket = SOCKET_LIST[i];
+		//if player is offline notify
 		if(recipientSocket === null){
 			socket.emit('addToChat','The player ' + data.username + ' is not online.');
 		} else {
@@ -173,23 +193,26 @@ Player.onConnect = function(socket,username){
 		}
 	});
 	
+	//gets data of player and bullets
 	socket.emit('init',{
 		selfId:socket.id,
 		player:Player.getAllInitPack(),
 		bullet:Bullet.getAllInitPack(),
 	})
 }
+//gets all player data in list
 Player.getAllInitPack = function(){
 	var players = [];
 	for(var i in Player.list)
 		players.push(Player.list[i].getInitPack());
 	return players;
 }
-
+//removes player data once disconnected
 Player.onDisconnect = function(socket){
 	delete Player.list[socket.id];
 	removePack.player.push(socket.id);
 }
+//updates player data once new player connects
 Player.update = function(){
 	var pack = [];
 	for(var i in Player.list){
@@ -200,7 +223,7 @@ Player.update = function(){
 	return pack;
 }
 
-
+//bullet object handles random location, speed and damage
 var Bullet = function(param){
 	var self = Entity(param);
 	self.id = Math.random();
@@ -216,12 +239,12 @@ var Bullet = function(param){
 		if(self.timer++ > 100)
 			self.toRemove = true;
 		super_update();
-		
+		//each hit depletes hp by 1 
 		for(var i in Player.list){
 			var p = Player.list[i];
 			if(self.map === p.map && self.getDistance(p) < 32 && self.parent !== p.id){
 				p.hp -= 1;
-								
+				//adds score once player is defeated	
 				if(p.hp <= 0){
 					var shooter = Player.list[self.parent];
 					if(shooter)
@@ -234,6 +257,7 @@ var Bullet = function(param){
 			}
 		}
 	}
+	//gets data
 	self.getInitPack = function(){
 		return {
 			id:self.id,
@@ -242,6 +266,7 @@ var Bullet = function(param){
 			map:self.map,
 		};
 	}
+	//gets update data
 	self.getUpdatePack = function(){
 		return {
 			id:self.id,
@@ -249,13 +274,14 @@ var Bullet = function(param){
 			y:self.y,		
 		};
 	}
-	
+	//sets bullets to a specific player (control)
 	Bullet.list[self.id] = self;
 	initPack.bullet.push(self.getInitPack());
 	return self;
 }
+//list of bullets for each player
 Bullet.list = {};
-
+//updates bullets, or removes them
 Bullet.update = function(){
 	var pack = [];
 	for(var i in Bullet.list){
@@ -269,7 +295,7 @@ Bullet.update = function(){
 	}
 	return pack;
 }
-
+//gets all data from player bullet data
 Bullet.getAllInitPack = function(){
 	var bullets = [];
 	for(var i in Bullet.list)
@@ -279,6 +305,7 @@ Bullet.getAllInitPack = function(){
 
 var DEBUG = true;
 
+//users that already have accounts
 var USERS = {
     //username:password
     "Admin":"login1",
@@ -286,16 +313,19 @@ var USERS = {
     "Vader":"login3",  
 }
  
+//password validation
 var isValidPassword = function(data,cb){
     setTimeout(function(){
         cb(USERS[data.username] === data.password);
     },10);
 }
+//username validation
 var isUsernameTaken = function(data,cb){
     setTimeout(function(){
         cb(USERS[data.username]);
     },10);
 }
+//add user functionality
 var addUser = function(data,cb){
     setTimeout(function(){
         USERS[data.username] = data.password;
@@ -308,8 +338,8 @@ var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
 	socket.id = Math.random();
 	SOCKET_LIST[socket.id] = socket;
-	
-	socket.on('signIn',function(data){ //{username,password}
+	//sign in socket functionality
+	socket.on('signIn',function(data){ 
 		isValidPassword(data,function(res){
 			if(res){
 				Player.onConnect(socket,data.username);
@@ -319,6 +349,7 @@ io.sockets.on('connection', function(socket){
 			}
 		});
 	});
+	//socket sign up functionality
 	socket.on('signUp',function(data){
 		isUsernameTaken(data,function(res){
 			if(res){
@@ -331,7 +362,7 @@ io.sockets.on('connection', function(socket){
 		});		
 	});
 	
-	
+	//handles disconnected sockets
 	socket.on('disconnect',function(){
 		delete SOCKET_LIST[socket.id];
 		Player.onDisconnect(socket);
@@ -344,16 +375,16 @@ io.sockets.on('connection', function(socket){
 		socket.emit('evalAnswer',res);		
 	});
 });
-
+//contains all intial data and removed data for players and bullets
 var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
-
+//updates player and bullets for each frame or movement
 setInterval(function(){
 	var pack = {
 		player:Player.update(),
 		bullet:Bullet.update(),
 	}
-	
+	//handles each player in regard to removal and updates
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
 		socket.emit('init',initPack);
@@ -365,4 +396,4 @@ setInterval(function(){
 	removePack.player = [];
 	removePack.bullet = [];
 	
-},1000/25);
+},1000/25); //game runs at 25 frames per second
