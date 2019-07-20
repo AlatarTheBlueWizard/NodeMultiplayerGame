@@ -5,13 +5,19 @@ var db = USE_DB ? mongojs('mongodb+srv://user:pass@mygame-4y1xa.mongodb.net/test
 //account collection: {username:string, password:string}
 //progress collection: {username:string, items:[{id:string,amount:number}]}
 var USE_DB = true;
-var mongodb = USE_DB ? require('mongodb') : null;
+/*var mongodb = USE_DB ? require('mongodb') : null;
 var mongojs = USE_DB ? require("mongojs") : null;
 var MongoClient = mongodb.MongoClient;
 var url = 'mongodb+srv://user:pass@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';
-var db = USE_DB ? mongodb(url, ['account','progress']) : null;
+var db = USE_DB ? mongodb(url, ['account','progress']) : null;*/
 
-Database = {};
+const MongoClient = USE_DB ? require(‘mongodb’).MongoClient : null;
+const uri = "mongodb+srv://user:pass@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true });
+client.connect(err => {
+  const collection = client.db("test").collection("devices");
+  // perform actions on the collection object
+  Database = {};
 Database.isValidPassword = function(data,cb){
 			if(!USE_DB)
 				return cb(true);
@@ -58,6 +64,10 @@ Database.isValidPassword = function(data,cb){
 				return cb();
 			db.progress.update({username:data.username},data,{upsert:true},cb);
 		}
+  client.close();
+});
+
+
 /*MongoClient.connect(url,function(err,db){
 	if(err)
 		console.log('Unable to connect to the mongoDB server. Error:', err);
