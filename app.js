@@ -21,7 +21,7 @@ var Entity = function(param){
 		spdX:0,
 		spdY:0,
 		id:"",
-		map:'forest',
+		map:'outside',
 	}
 	if(param){
 		if(param.x)
@@ -140,9 +140,9 @@ var Player = function(param){
 Player.list = {};
 //handles location once connected
 Player.onConnect = function(socket,username){
-	var map = 'forest';
+	var map = 'outside';
 	if(Math.random() < 0.5)
-		map = 'field';
+		map = 'grayEarth';
 	else if(Math.random() < 0.5)
 		map = 'dungeon';
 	var player = Player({
@@ -168,12 +168,12 @@ Player.onConnect = function(socket,username){
 	
 	//change map functionality
 	socket.on('changeMap',function(data){
-		if(player.map === 'field')
-			player.map = 'forest';
-		else if(player.map === 'forest')
+		if(player.map === 'outside')
+			player.map = 'grayEarth';
+		else if(player.map === 'grayEarth')
 			player.map = 'dungeon';
 		else
-			player.map = 'field';
+			player.map = 'dungeon';
 	});
 	
 	//message sending functionality
