@@ -1,12 +1,11 @@
 Inventory = function(items,socket,server){
-	var self = {
-		items:items,
+    var self = {
+        items:items, //{id:"itemId",amount:1}
 		socket:socket,
 		server:server,
-	}
-	//add item config
-	self.addItem = function(id,amount){
-		for(var i = 0; i < self.items.length; i++){
+    }
+    self.addItem = function(id,amount){
+		for(var i = 0 ; i < self.items.length; i++){
 			if(self.items[i].id === id){
 				self.items[i].amount += amount;
 				self.refreshRender();
@@ -15,10 +14,9 @@ Inventory = function(items,socket,server){
 		}
 		self.items.push({id:id,amount:amount});
 		self.refreshRender();
-	}
-	//remove item config
-	self.removeItem = function(id,amount){
-		for(var i = 0; i < self.items.length; i++){
+    }
+    self.removeItem = function(id,amount){
+		for(var i = 0 ; i < self.items.length; i++){
 			if(self.items[i].id === id){
 				self.items[i].amount -= amount;
 				if(self.items[i].amount <= 0)
@@ -26,36 +24,35 @@ Inventory = function(items,socket,server){
 				self.refreshRender();
 				return;
 			}
-		}
-	}
-	//checks if item exists
-	self.hasItem = function(id, amount){
-		for(var i = 0; i < self.items.length; i++){
+		}    
+    }
+    self.hasItem = function(id,amount){
+		for(var i = 0 ; i < self.items.length; i++){
 			if(self.items[i].id === id){
 				return self.items[i].amount >= amount;
 			}
-		}
+		}  
 		return false;
-	}
+    }
 	self.refreshRender = function(){
 		//server
 		if(self.server){
 			self.socket.emit('updateInventory',self.items);
 			return;
 		}
-		//client
-		var Inventory = document.getElementById("inventory");
+		//client only
+		var inventory = document.getElementById("inventory");
 		inventory.innerHTML = "";
 		var addButton = function(data){
 			let item = Item.list[data.id];
-			let button = document.createElement('button');
+			let button = document.createElement('button'); 
 			button.onclick = function(){
 				self.socket.emit("useItem",item.id);
 			}
 			button.innerText = item.name + " x" + data.amount;
 			inventory.appendChild(button);
 		}
-		for(var i = 0; i < self.items.length; i++)
+		for(var i = 0 ; i < self.items.length; i++)
 			addButton(self.items[i]);
 	}
 	if(self.server){
@@ -67,9 +64,12 @@ Inventory = function(items,socket,server){
 			let item = Item.list[itemId];
 			item.event(Player.list[self.socket.id]);
 		});
+
 	}
+
 	return self;
 }
+
 
 Item = function(id,name,event){
 	var self = {
@@ -80,7 +80,6 @@ Item = function(id,name,event){
 	Item.list[self.id] = self;
 	return self;
 }
-
 Item.list = {};
 
 Item("potion","Potion",function(player){
@@ -90,6 +89,6 @@ Item("potion","Potion",function(player){
 });
 
 Item("superAttack","Super Attack",function(player){
-	for(var i = 0; i < 360; i++)
+	for(var i = 0 ; i < 360; i++)
 		player.shootBullet(i);
 });
