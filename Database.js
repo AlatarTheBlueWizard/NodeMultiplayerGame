@@ -1,16 +1,18 @@
-var USE_DB = true;
+/*var USE_DB = true;
 var mongojs = USE_DB ? require("mongojs") : null;
-var mongodb = USE_DB ? require("mongodb") : null;
 var uri = 'mongodb+srv://admin:ad@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';
-var db = USE_DB ? mongodb(uri, ['account','progress']) : null;
+var db = USE_DB ? mongodb(uri, ['account','progress']) : null;*/
 //account:  {username:string, password:string}
 //progress:  {username:string, items:[{id:string,amount:number}]}
-
+var USE_DB = true;
+var databaseUrl = 'mongodb+srv://admin:ad@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';
+var collections = ["account","progress"];
+var db = USE_DB ? require("mongojs").connect(databaseUrl, collections) : null;
 Database = {};
 Database.isValidPassword = function(data,cb){
     if(!USE_DB)
         return cb(true);
-	db.account.findOne({username:data.username,password:data.password},function(err,res){
+	db.account.find({username:data.username,password:data.password},function(err,res){
 		if(res)
 			cb(true);
 		else
@@ -20,7 +22,7 @@ Database.isValidPassword = function(data,cb){
 Database.isUsernameTaken = function(data,cb){
     if(!USE_DB)
         return cb(false);
-	db.account.findOne({username:data.username},function(err,res){
+	db.account.find({username:data.username},function(err,res){
 		if(res)
 			cb(true);
 		else
@@ -39,7 +41,7 @@ Database.addUser = function(data,cb){
 Database.getPlayerProgress = function(username,cb){
     if(!USE_DB)
         return cb({items:[]});
-	db.progress.findOne({username:username},function(err,res){
+	db.progress.find({username:username},function(err,res){
 		cb({items:res.items});
 	});
 }
