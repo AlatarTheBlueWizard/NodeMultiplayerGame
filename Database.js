@@ -1,5 +1,6 @@
 var USE_DB = true;
 var mongojs = USE_DB ? require("mongojs") : null;
+var mongodb = USE_DB ? require("mongodb") : null;
 var uri = 'mongodb+srv://admin:ad@mygame-4y1xa.mongodb.net/test?retryWrites=true&w=majority';
 var db = USE_DB ? mongojs(uri, ['account','progress']) : null;
 //account:  {username:string, password:string}
