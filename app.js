@@ -173,7 +173,7 @@ Player.onConnect = function(socket,username){
 		else if(player.map === 'grayEarth')
 			player.map = 'dungeon';
 		else
-			player.map = 'dungeon';
+			player.map = 'outside';
 	});
 	
 	//message sending functionality
