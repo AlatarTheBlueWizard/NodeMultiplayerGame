@@ -39,6 +39,16 @@
     var HEIGHT = 500; //height of drawn map
     var socket = io();
     
+    //canvas boundaries
+    var border = document.getElementById('ctx').WIDTH - player.WIDTH;
+    function playerBounds() {
+        if(player.x < 0)
+            player.x = 0;
+
+        if(player.x > border)
+            player.x = border;
+    }
+
     //sign
     var signDiv = document.getElementById('signDiv');
     var signDivUsername = document.getElementById('signDiv-username');
