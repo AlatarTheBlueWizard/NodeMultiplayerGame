@@ -1,7 +1,3 @@
-require('./Database.js');
-//require('./Entity.js');
-require('./client/Inventory.js');
-
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
@@ -15,12 +11,7 @@ serv.listen(process.env.PORT || 2000);
 console.log("Server started.");
 
 var SOCKET_LIST = {};
-var DEBUG = true;
-
-var initPack = {player:[],bullet:[]};
-var removePack = {player:[],bullet:[]};
-
-Entity = function(param){
+var Entity = function(param){
 	var self = {
 		x:250,
 		y:250,
@@ -52,30 +43,8 @@ Entity = function(param){
 	}
 	return self;
 }
-Entity.getFrameUpdateData = function(){
-	var pack = {
-		initPack:{
-			player:initPack.player,
-			bullet:initPack.bullet,
-		},
-		removePack:{
-			player:removePack.player,
-			bullet:removePack.bullet,
-		},
-		updatePack:{
-			player:Player.update(),
-			bullet:Bullet.update(),
-		}
-	};
-	initPack.player = [];
-	initPack.bullet = [];
-	removePack.player = [];
-	removePack.bullet = [];
-	return pack;
-}
 
-
-Player = function(param){
+var Player = function(param){
 	var self = Entity(param);
 	self.number = "" + Math.floor(10 * Math.random());
 	self.username = param.username;
@@ -89,7 +58,6 @@ Player = function(param){
 	self.hp = 10;
 	self.hpMax = 10;
 	self.score = 0;
-	self.inventory = new Inventory(param.progress.items,param.socket,true);
 	
 	var super_update = self.update;
 	self.update = function(){
@@ -102,8 +70,6 @@ Player = function(param){
 		}
 	}
 	self.shootBullet = function(angle){
-		if(Math.random() < 0.1)
-			self.inventory.addItem("potion",1);
 		Bullet({
 			parent:self.id,
 			angle:angle,
@@ -158,7 +124,7 @@ Player = function(param){
 	return self;
 }
 Player.list = {};
-Player.onConnect = function(socket,username,progress){
+Player.onConnect = function(socket,username){
 	var map = 'forest';
 	if(Math.random() < 0.5)
 		map = 'field';
@@ -166,11 +132,7 @@ Player.onConnect = function(socket,username,progress){
 		username:username,
 		id:socket.id,
 		map:map,
-		socket:socket,
-		progress:progress,
 	});
-	player.inventory.refreshRender();
-
 	socket.on('keyPress',function(data){
 		if(data.inputId === 'left')
 			player.pressingLeft = data.state;
@@ -225,13 +187,6 @@ Player.getAllInitPack = function(){
 }
 
 Player.onDisconnect = function(socket){
-	let player = Player.list[socket.id];
-	if(!player)
-		return;
-	Database.savePlayerProgress({
-		username:player.username,
-		items:player.inventory.items,
-	});
 	delete Player.list[socket.id];
 	removePack.player.push(socket.id);
 }
@@ -246,7 +201,7 @@ Player.update = function(){
 }
 
 
-Bullet = function(param){
+var Bullet = function(param){
 	var self = Entity(param);
 	self.id = Math.random();
 	self.angle = param.angle;
@@ -320,6 +275,32 @@ Bullet.getAllInitPack = function(){
 	for(var i in Bullet.list)
 		bullets.push(Bullet.list[i].getInitPack());
 	return bullets;
+}
+
+var DEBUG = true;
+
+var USERS = {
+    //username:password
+    "Admin":"login1",
+    "Stryker":"login2",
+    "Vader":"login3",  
+}
+ 
+var isValidPassword = function(data,cb){
+    setTimeout(function(){
+        cb(USERS[data.username] === data.password);
+    },10);
+}
+var isUsernameTaken = function(data,cb){
+    setTimeout(function(){
+        cb(USERS[data.username]);
+    },10);
+}
+var addUser = function(data,cb){
+    setTimeout(function(){
+        USERS[data.username] = data.password;
+        cb();
+    },10);
 }
 
 //socket io config
