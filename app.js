@@ -310,21 +310,21 @@ io.sockets.on('connection', function(socket){
 	SOCKET_LIST[socket.id] = socket;
 	
 	socket.on('signIn',function(data){ //{username,password}
-		Database.isValidPassword(data,function(res){
-			if(!res)
-				return socket.emit('signInResponse',{success:false});
-			Database.getPlayerProgress(data.username,function(progress){
-				Player.onConnect(socket,data.username,progress);
+		isValidPassword(data,function(res){
+			if(res){
+				Player.onConnect(socket,data.username);
 				socket.emit('signInResponse',{success:true});
-			})
+			} else {
+				socket.emit('signInResponse',{success:false});			
+			}
 		});
 	});
 	socket.on('signUp',function(data){
-		Database.isUsernameTaken(data,function(res){
+		isUsernameTaken(data,function(res){
 			if(res){
 				socket.emit('signUpResponse',{success:false});		
 			} else {
-				Database.addUser(data,function(){
+				addUser(data,function(){
 					socket.emit('signUpResponse',{success:true});					
 				});
 			}
@@ -343,9 +343,6 @@ io.sockets.on('connection', function(socket){
 		var res = eval(data);
 		socket.emit('evalAnswer',res);		
 	});
-	
-	
-	
 });
 
 var initPack = {player:[],bullet:[]};
